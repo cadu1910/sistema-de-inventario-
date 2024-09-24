@@ -1,0 +1,59 @@
+# Sistema de Inventário
+
+## Descrição
+Este é um sistema simples de inventário desenvolvido em SQL, que permite gerenciar produtos, categorias, fornecedores e transações de estoque. As transações podem ser de entrada (adição de estoque) ou saída (remoção de estoque).
+
+## Funcionalidades
+- **Gerenciamento de Produtos**: Armazenamento de produtos com suas respectivas categorias e fornecedores.
+- **Controle de Estoque**: Registro de entradas e saídas de produtos no estoque.
+- **Consultas**: Exibição de todos os produtos, controle do estoque atual e total de transações.
+- **Atualização e Exclusão**: Possibilidade de atualizar a quantidade em estoque e excluir produtos do sistema.
+
+## Tabelas
+1. **Categorias**: Contém as diferentes categorias de produtos.
+2. **Fornecedores**: Armazena informações sobre os fornecedores.
+3. **Produtos**: Lista todos os produtos do inventário, relacionando-os com categorias e fornecedores.
+4. **Transações**: Registra entradas e saídas de produtos.
+
+## Requisitos
+- Servidor SQL compatível com MySQL ou MariaDB.
+- Ferramenta para executar scripts SQL (como MySQL Workbench ou phpMyAdmin).
+
+## Como usar
+1. Clone este repositório.
+2. Execute o script SQL `sistema_inventario.sql` para criar as tabelas e inserir os dados no banco de dados.
+3. Utilize as consultas fornecidas para gerenciar o inventário e realizar operações no sistema.
+
+## Estrutura do Projeto
+- `sistema_inventario.sql`: Arquivo contendo o código SQL para criar e popular o banco de dados.
+- `README.md`: Documentação do projeto.
+- `.gitignore`: Arquivo para excluir arquivos desnecessários do controle de versão.
+- `LICENSE`: Licença do projeto.
+
+## Consultas Úteis
+- **Exibir todos os produtos com categorias e fornecedores**:
+    
+    SELECT 
+      produtos.nome_produto,
+      produtos.descricao,
+      produtos.preco,
+      produtos.quantidade_em_estoque,
+      categorias.nome_categoria,
+      fornecedores.nome_fornecedor
+    FROM produtos
+    JOIN categorias ON produtos.categoria_id = categorias.categoria_id
+    JOIN fornecedores ON produtos.fornecedor_id = fornecedores.fornecedor_id;
+    
+- **Total de transações por produto**:
+    
+    SELECT 
+      produtos.nome_produto,
+      SUM(CASE WHEN transacoes.tipo_transacao = 'Entrada' THEN transacoes.quantidade ELSE 0 END) AS total_entradas,
+      SUM(CASE WHEN transacoes.tipo_transacao = 'Saída' THEN transacoes.quantidade ELSE 0 END) AS total_saidas
+    FROM transacoes
+    JOIN produtos ON transacoes.produto_id = produtos.produto_id
+    GROUP BY produtos.nome_produto;
+    
+
+## Licença
+Este projeto está licenciado sob os termos da [MIT License](LICENSE).
