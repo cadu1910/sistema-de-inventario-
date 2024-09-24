@@ -1,0 +1,118 @@
+-- Criação do banco de dados
+DROP DATABASE IF EXISTS sistema_inventario;
+CREATE DATABASE sistema_inventario;
+
+-- Seleção do banco de dados
+USE sistema_inventario;
+
+-- Criação da tabela de categorias
+CREATE TABLE categorias (
+  categoria_id INT PRIMARY KEY AUTO_INCREMENT,
+  nome_categoria VARCHAR(100) NOT NULL
+);
+
+-- Criação da tabela de fornecedores
+CREATE TABLE fornecedores (
+  fornecedor_id INT PRIMARY KEY AUTO_INCREMENT,
+  nome_fornecedor VARCHAR(100) NOT NULL,
+  telefone VARCHAR(20),
+  email VARCHAR(100),
+  endereco VARCHAR(255)
+);
+
+-- Criação da tabela de produtos
+CREATE TABLE produtos (
+  produto_id INT PRIMARY KEY AUTO_INCREMENT,
+  nome_produto VARCHAR(100) NOT NULL,
+  descricao VARCHAR(255),
+  preco DECIMAL(10, 2),
+  quantidade_em_estoque INT,
+  categoria_id INT,
+  fornecedor_id INT,
+  FOREIGN KEY (categoria_id) REFERENCES categorias(categoria_id),
+  FOREIGN KEY (fornecedor_id) REFERENCES fornecedores(fornecedor_id)
+);
+
+-- Criação da tabela de transações (entradas e saídas de produtos)
+CREATE TABLE transacoes (
+  transacao_id INT PRIMARY KEY AUTO_INCREMENT,
+  produto_id INT,
+  tipo_transacao VARCHAR(10), -- Entrada, Saída
+  quantidade INT,
+  data_transacao DATE,
+  FOREIGN KEY (produto_id) REFERENCES produtos(produto_id)
+);
+
+-- Inserção de dados na tabela de categorias
+INSERT INTO categorias (nome_categoria) VALUES
+('Eletrônicos'),
+('Móveis'),
+('Roupas'),
+('Alimentos');
+
+-- Inserção de dados na tabela de fornecedores
+INSERT INTO fornecedores (nome_fornecedor, telefone, email, endereco) VALUES
+('Fornecedor A', '11999999999', 'fornecedorA@email.com', 'Rua A, 123'),
+('Fornecedor B', '11988888888', 'fornecedorB@email.com', 'Rua B, 456'),
+('Fornecedor C', '11977777777', 'fornecedorC@email.com', 'Rua C, 789');
+
+-- Inserção de dados na tabela de produtos
+INSERT INTO produtos (nome_produto, descricao, preco, quantidade_em_estoque, categoria_id, fornecedor_id) VALUES
+('Laptop', 'Laptop de última geração', 3500.00, 10, 1, 1),
+('Sofá', 'Sofá de 3 lugares', 1200.00, 5, 2, 2),
+('Camisa', 'Camisa de algodão', 50.00, 100, 3, 3),
+('Maçã', 'Maçã fresca', 5.00, 200, 4, 3);
+
+-- Inserção de dados na tabela de transações (entradas)
+INSERT INTO transacoes (produto_id, tipo_transacao, quantidade, data_transacao) VALUES
+(1, 'Entrada', 10, '2024-09-20'),
+(2, 'Entrada', 5, '2024-09-20'),
+(3, 'Entrada', 100, '2024-09-20'),
+(4, 'Entrada', 200, '2024-09-20');
+
+-- Inserção de dados na tabela de transações (saídas)
+INSERT INTO transacoes (produto_id, tipo_transacao, quantidade, data_transacao) VALUES
+(1, 'Saída', 2, '2024-09-21'),
+(3, 'Saída', 20, '2024-09-21'),
+(4, 'Saída', 50, '2024-09-22');
+
+-- Consulta para exibir todos os produtos com suas categorias e fornecedores
+SELECT 
+  produtos.nome_produto,
+  produtos.descricao,
+  produtos.preco,
+  produtos.quantidade_em_estoque,
+  categorias.nome_categoria,
+  fornecedores.nome_fornecedor
+FROM produtos
+JOIN categorias ON produtos.categoria_id = categorias.categoria_id
+JOIN fornecedores ON produtos.fornecedor_id = fornecedores.fornecedor_id;
+
+-- Consulta para exibir o total de transações de entrada e saída por produto
+SELECT 
+  produtos.nome_produto,
+  SUM(CASE WHEN transacoes.tipo_transacao = 'Entrada' THEN transacoes.quantidade ELSE 0 END) AS total_entradas,
+  SUM(CASE WHEN transacoes.tipo_transacao = 'Saída' THEN transacoes.quantidade ELSE 0 END) AS total_saidas
+FROM transacoes
+JOIN produtos ON transacoes.produto_id = produtos.produto_id
+GROUP BY produtos.nome_produto;
+
+-- Consulta para exibir o estoque atual de cada produto
+SELECT 
+  produtos.nome_produto,
+  produtos.quantidade_em_estoque
+FROM produtos;
+
+-- Atualização da quantidade em estoque de um produto após uma transação de entrada
+UPDATE produtos
+SET quantidade_em_estoque = quantidade_em_estoque + 10
+WHERE produto_id = 1;
+
+-- Atualização da quantidade em estoque de um produto após uma transação de saída
+UPDATE produtos
+SET quantidade_em_estoque = quantidade_em_estoque - 5
+WHERE produto_id = 2;
+
+-- Exclusão de um produto e suas transações relacionadas
+DELETE FROM transacoes WHERE produto_id = 3;
+DELETE FROM produtos WHERE produto_id = 3;
