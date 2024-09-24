@@ -1,0 +1,21 @@
+# Ignorar arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Banco de dados local
+*.sql
+
+# Configurações de IDEs
+.vscode/
+.idea/
+
+# Arquivos temporários
+*.tmp
+*.bak
+
+# Arquivos de backup
+*.bak
+*.swp
